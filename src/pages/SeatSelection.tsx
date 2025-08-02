@@ -144,120 +144,92 @@ const SeatSelection = () => {
       <div className="absolute inset-0 gradient-animated opacity-20" />
       <div className="absolute inset-0 bg-background/90 backdrop-blur-sm" />
       
-      {/* Header */}
-      <div className="relative z-10 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              className="btn-ghost group"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2 group-hover:translate-x-[-2px] transition-transform" />
-              Volver
-            </Button>
-            
-            <Card className="glass-secondary px-6 py-3">
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-event-success rounded-full" />
-                  <span>Disponible</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-event-error rounded-full" />
-                  <span>Ocupado</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-event-primary rounded-full" />
-                  <span>Seleccionado</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-event-primary to-event-secondary bg-clip-text text-transparent mb-2">
+      {/* Scrollable Title */}
+      <div className="relative z-10 flex justify-center pt-8 pb-4">
+        <div className="bg-black/40 backdrop-blur-3xl border border-white/20 rounded-2xl px-8 py-4 shadow-2xl animate-scale-in">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary via-event-secondary to-purple-400 bg-clip-text text-transparent">
               Selecciona tu Asiento
             </h1>
-            <p className="text-muted-foreground flex items-center justify-center space-x-2">
-              <MapPin className="w-4 h-4" />
-              <span>Haz clic en un asiento disponible para reservar</span>
-            </p>
+            <p className="text-sm text-white/90 mt-1 font-medium">Haz clic en cualquier asiento disponible</p>
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 flex-1">
-        <div className="max-w-7xl mx-auto px-6 pb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Seat Map */}
-            <div className="lg:col-span-3">
-              <Card className="glass-primary p-6 h-full">
-                <SeatMap
-                  mesas={mesas}
-                  asientos={asientos}
-                  reservas={reservas}
-                  selectedSeat={selectedSeat}
-                  onSeatSelect={handleSeatSelect}
-                />
-              </Card>
+      {/* Full Screen Seat Map */}
+      <div className="relative z-10 flex-1 overflow-hidden">
+        <SeatMap
+          mesas={mesas}
+          asientos={asientos}
+          reservas={reservas}
+          selectedSeat={selectedSeat}
+          onSeatSelect={handleSeatSelect}
+        />
+      </div>
+
+      {/* macOS Style Floating Dock */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="bg-black/40 backdrop-blur-3xl border border-white/20 rounded-2xl px-6 py-4 shadow-2xl animate-scale-in">
+          <div className="flex items-center space-x-6">
+            {/* Elegant Exit Button */}
+            <Button
+              variant="ghost"
+              onClick={handleBack}
+              className="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-300 p-0 hover:scale-110 shadow-lg hover:shadow-xl group"
+              title="Salir del evento"
+            >
+              <ArrowLeft className="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
+            </Button>
+
+            {/* Separator */}
+            <div className="w-px h-8 bg-white/30"></div>
+
+            {/* Stats */}
+            <div className="flex items-center space-x-4 text-white">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-event-success rounded-full shadow-lg border border-event-success/50"></div>
+                <span className="text-sm font-bold">{asientos.length - reservas.length}</span>
+                <span className="text-xs text-white/90 font-medium">Libres</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-500 rounded-full shadow-lg border border-blue-400/50"></div>
+                <span className="text-sm font-bold">{reservas.length}</span>
+                <span className="text-xs text-white/90 font-medium">Ocupados</span>
+              </div>
             </div>
 
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="space-y-4">
-                {/* Event info */}
-                <Card className="glass-secondary p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-event-primary to-event-secondary rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Información del Evento</h3>
-                      <p className="text-sm text-muted-foreground">Datos en tiempo real</p>
-                    </div>
+            {/* Selected Seat Info */}
+            {selectedSeat && (
+              <>
+                <div className="w-px h-8 bg-white/30"></div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-event-primary via-event-secondary to-purple-500 rounded-xl flex items-center justify-center shadow-lg border border-white/20">
+                    <span className="text-sm font-bold text-white">#{selectedSeat.numero}</span>
                   </div>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Mesas totales:</span>
-                      <span className="font-medium">{mesas.length}</span>
+                  <div className="text-white">
+                    <div className="text-sm font-bold">
+                      {mesas.find(m => m.id === selectedSeat.mesa_id)?.nombre}
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Asientos totales:</span>
-                      <span className="font-medium">{asientos.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Ocupados:</span>
-                      <span className="font-medium text-event-error">{reservas.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Disponibles:</span>
-                      <span className="font-medium text-event-success">
-                        {asientos.length - reservas.length}
-                      </span>
-                    </div>
+                    <div className="text-xs text-white/90 font-medium">Seleccionado</div>
                   </div>
-                </Card>
+                </div>
+              </>
+            )}
 
-                {/* Selected seat info */}
-                {selectedSeat && (
-                  <Card className="glass-primary p-6 animate-slide-in-right">
-                    <h3 className="font-semibold mb-2">Asiento Seleccionado</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Mesa:</span>
-                        <span className="font-medium">
-                          {mesas.find(m => m.id === selectedSeat.mesa_id)?.nombre}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Asiento:</span>
-                        <span className="font-medium">#{selectedSeat.numero}</span>
-                      </div>
-                    </div>
-                  </Card>
-                )}
+            {/* Legend */}
+            <div className="w-px h-8 bg-white/30"></div>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-event-success rounded-full shadow-sm border border-event-success/30"></div>
+                <span className="text-xs text-white/90 font-medium">Libre</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm border border-blue-400/30"></div>
+                <span className="text-xs text-white/90 font-medium">Ocupado</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-gradient-to-r from-event-primary to-event-secondary rounded-full shadow-sm border border-white/20"></div>
+                <span className="text-xs text-white/90 font-medium">Seleccionado</span>
               </div>
             </div>
           </div>
