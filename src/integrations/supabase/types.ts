@@ -20,18 +20,24 @@ export type Database = {
           id: number
           mesa_id: number | null
           numero: number | null
+          ocupado: boolean | null
+          posicion: number | null
         }
         Insert: {
           created_at?: string
           id?: number
           mesa_id?: number | null
           numero?: number | null
+          ocupado?: boolean | null
+          posicion?: number | null
         }
         Update: {
           created_at?: string
           id?: number
           mesa_id?: number | null
           numero?: number | null
+          ocupado?: boolean | null
+          posicion?: number | null
         }
         Relationships: [
           {
@@ -41,46 +47,86 @@ export type Database = {
             referencedRelation: "mesa"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_asiento_mesa"
+            columns: ["mesa_id"]
+            isOneToOne: false
+            referencedRelation: "mesa"
+            referencedColumns: ["id"]
+          },
         ]
       }
       mesa: {
         Row: {
+          capacidad: number | null
           created_at: string
           id: number
+          nombre: string | null
           numero: number | null
         }
         Insert: {
+          capacidad?: number | null
           created_at?: string
           id?: number
+          nombre?: string | null
           numero?: number | null
         }
         Update: {
+          capacidad?: number | null
           created_at?: string
           id?: number
+          nombre?: string | null
           numero?: number | null
         }
         Relationships: []
       }
       reserva: {
         Row: {
+          asiento_id: number | null
           created_at: string
+          estado: string | null
           id: number
           mesa_id: number | null
           usuario_id: number | null
         }
         Insert: {
+          asiento_id?: number | null
           created_at?: string
+          estado?: string | null
           id?: number
           mesa_id?: number | null
           usuario_id?: number | null
         }
         Update: {
+          asiento_id?: number | null
           created_at?: string
+          estado?: string | null
           id?: number
           mesa_id?: number | null
           usuario_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_reserva_asiento"
+            columns: ["asiento_id"]
+            isOneToOne: false
+            referencedRelation: "asiento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reserva_mesa"
+            columns: ["mesa_id"]
+            isOneToOne: false
+            referencedRelation: "mesa"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reserva_usuario"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reserva_mesa_id_fkey"
             columns: ["mesa_id"]
@@ -104,9 +150,11 @@ export type Database = {
           correo: string | null
           created_at: string
           dni: string | null
+          fecha_reserva: string | null
           id: number
           nombres: string | null
           reservado: boolean | null
+          telefono: string | null
         }
         Insert: {
           apellidos?: string | null
@@ -114,9 +162,11 @@ export type Database = {
           correo?: string | null
           created_at?: string
           dni?: string | null
+          fecha_reserva?: string | null
           id?: number
           nombres?: string | null
           reservado?: boolean | null
+          telefono?: string | null
         }
         Update: {
           apellidos?: string | null
@@ -124,9 +174,11 @@ export type Database = {
           correo?: string | null
           created_at?: string
           dni?: string | null
+          fecha_reserva?: string | null
           id?: number
           nombres?: string | null
           reservado?: boolean | null
+          telefono?: string | null
         }
         Relationships: []
       }
