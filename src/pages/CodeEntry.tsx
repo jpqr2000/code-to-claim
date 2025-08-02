@@ -45,11 +45,21 @@ const CodeEntry = () => {
         return;
       }
 
-      // Verificar si ya tiene una reserva
-      if (usuario.reservado) {
+      // Verificar si ya tiene una reserva (doble verificación por seguridad)
+      const { data: reservaExistente } = await supabase
+        .from("reserva")
+        .select("id")
+        .eq("usuario_id", usuario.id)
+        .limit(1);
+
+      const tieneReserva = usuario.reservado || (reservaExistente && reservaExistente.length > 0);
+
+      if (tieneReserva) {
+        console.log("Usuario con reserva existente, redirigiendo a detalles");
         // Redirigir a detalles de reserva
         navigate("/details", { state: { userId: usuario.id } });
       } else {
+        console.log("Usuario sin reserva, redirigiendo a selección de asiento");
         // Redirigir a selección de asiento
         navigate("/select-seat", { state: { userId: usuario.id } });
       }

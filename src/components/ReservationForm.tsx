@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { X, User, Mail, Phone, IdCard, CheckCircle } from "lucide-react";
@@ -143,11 +143,7 @@ const ReservationForm = ({ userId, selectedSeat, mesa, onClose, onSuccess }: Res
 
       if (asientoError) throw asientoError;
 
-      toast({
-        title: "¡Reserva exitosa!",
-        description: "Tu asiento ha sido reservado correctamente",
-      });
-
+      // Redirigir a pantalla de éxito (sin toast ya que la pantalla de éxito lo mostrará)
       onSuccess();
     } catch (error) {
       console.error("Error al crear la reserva:", error);
@@ -333,6 +329,9 @@ const ReservationForm = ({ userId, selectedSeat, mesa, onClose, onSuccess }: Res
             <DialogTitle className="text-xl font-bold text-center">
               Confirmar Reserva
             </DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground">
+              Verifica que todos los datos sean correctos antes de confirmar
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">

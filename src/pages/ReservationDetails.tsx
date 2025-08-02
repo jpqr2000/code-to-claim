@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { User, MapPin, Calendar, LogOut, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { User, MapPin, Calendar, LogOut, CheckCircle, Share2, Home } from "lucide-react";
 
 interface ReservationData {
   usuario: {
@@ -33,6 +34,7 @@ const ReservationDetails = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const userId = location.state?.userId;
 
   useEffect(() => {
@@ -48,38 +50,61 @@ const ReservationDetails = () => {
     try {
       setLoading(true);
       
-      // Obtener datos completos de la reserva del usuario
+      // 1. Obtener la reserva más reciente del usuario
       const { data: reservaData, error: reservaError } = await supabase
         .from("reserva")
-        .select(`
-          *,
-          usuario!reserva_usuario_id_fkey (
-            nombres,
-            apellidos,
-            dni,
-            correo,
-            telefono,
-            codigo
-          ),
-          mesa!reserva_mesa_id_fkey (
-            nombre,
-            numero
-          ),
-          asiento!reserva_asiento_id_fkey (
-            numero
-          )
-        `)
+        .select("*")
         .eq("usuario_id", userId)
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
 
-      if (reservaError) throw reservaError;
+      if (reservaError) {
+        console.error("Error obteniendo reserva:", reservaError);
+        throw reservaError;
+      }
 
+      // 2. Obtener datos del usuario
+      const { data: usuarioData, error: usuarioError } = await supabase
+        .from("usuario")
+        .select("nombres, apellidos, dni, correo, telefono, codigo")
+        .eq("id", userId)
+        .single();
+
+      if (usuarioError) {
+        console.error("Error obteniendo usuario:", usuarioError);
+        throw usuarioError;
+      }
+
+      // 3. Obtener datos de la mesa
+      const { data: mesaData, error: mesaError } = await supabase
+        .from("mesa")
+        .select("nombre, numero")
+        .eq("id", reservaData.mesa_id)
+        .single();
+
+      if (mesaError) {
+        console.error("Error obteniendo mesa:", mesaError);
+        throw mesaError;
+      }
+
+      // 4. Obtener datos del asiento
+      const { data: asientoData, error: asientoError } = await supabase
+        .from("asiento")
+        .select("numero")
+        .eq("id", reservaData.asiento_id)
+        .single();
+
+      if (asientoError) {
+        console.error("Error obteniendo asiento:", asientoError);
+        throw asientoError;
+      }
+
+      // 5. Construir el objeto de datos
       setReservationData({
-        usuario: reservaData.usuario,
-        mesa: reservaData.mesa,
-        asiento: reservaData.asiento,
+        usuario: usuarioData,
+        mesa: mesaData,
+        asiento: asientoData,
         reserva: {
           created_at: reservaData.created_at,
           estado: reservaData.estado
@@ -96,6 +121,28 @@ const ReservationDetails = () => {
 
   const handleLogout = () => {
     navigate("/");
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: '🎫 Mi Reserva Confirmada',
+      text: `Mi reserva está confirmada:\n\n🎫 ${reservationData?.mesa.nombre} - Asiento #${reservationData?.asiento.numero}\n👤 ${reservationData?.usuario.nombres} ${reservationData?.usuario.apellidos}\n🔑 Código: ${reservationData?.usuario.codigo}\n\n¡Nos vemos en el evento!`,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    } else {
+      // Fallback: copiar al clipboard
+      navigator.clipboard.writeText(shareData.text);
+      toast({
+        title: "Información copiada",
+        description: "Los detalles de tu reserva se copiaron al portapapeles",
+      });
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -135,171 +182,129 @@ const ReservationDetails = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background */}
-      <div className="absolute inset-0 gradient-animated opacity-20" />
-      <div className="absolute inset-0 bg-background/90 backdrop-blur-sm" />
+      <div className="absolute inset-0 gradient-animated opacity-30" />
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
       
-      {/* Header */}
-      <div className="relative z-10 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8 pt-6">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary to-event-secondary bg-clip-text text-transparent">
-              Mi Reserva
-            </h1>
-            <p className="text-muted-foreground">
-              Código de acceso: <span className="font-mono font-medium">{reservationData.usuario.codigo}</span>
-            </p>
+      {/* Success animation orbs */}
+      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-event-success/20 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-event-primary/20 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }} />
+      
+      {/* Ticket Design - Compact, no scroll */}
+      <Card className="relative z-10 w-full max-w-md mx-auto glass-primary animate-scale-in border-2 border-dashed border-event-success/30 p-6">
+        {/* Ticket Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-event-success to-emerald-500 rounded-full mb-4 animate-glow-pulse">
+            <CheckCircle className="w-10 h-10 text-white" />
           </div>
-          
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="btn-ghost group"
-          >
-            <LogOut className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
-            Salir
-          </Button>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-event-success to-emerald-500 bg-clip-text text-transparent mb-2">
+            Mi Reserva
+          </h1>
+          <div className="inline-flex items-center px-3 py-1 bg-event-success/10 border border-event-success/30 rounded-full">
+            <div className="w-2 h-2 bg-event-success rounded-full animate-pulse mr-2"></div>
+            <span className="text-xs font-medium text-event-success">Confirmado</span>
+          </div>
         </div>
 
-        {/* Status Banner */}
-        <Card className="glass-primary p-6 mb-8 animate-fade-in">
-          <div className="flex items-center justify-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-event-success to-green-400 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-event-success">Reserva Confirmada</h2>
-              <p className="text-muted-foreground text-sm">
-                Tu lugar está garantizado para el evento
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Personal Information */}
-          <Card className="glass-secondary p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-event-primary to-event-secondary rounded-lg flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
+        {/* Ticket Body - Main Info */}
+        <div className="space-y-4 mb-6">
+          {/* Location Info - Most Important */}
+          <div className="text-center glass-secondary p-4 rounded-lg border border-event-primary/20">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-2xl font-bold text-event-primary mb-1">
+                  {reservationData.mesa.nombre}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Mesa</div>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Información Personal</h3>
-                <p className="text-sm text-muted-foreground">Datos del titular de la reserva</p>
+                <div className="text-2xl font-bold text-event-secondary mb-1">
+                  #{reservationData.asiento.numero}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Asiento</div>
               </div>
             </div>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="glass p-4 rounded-lg">
-                  <span className="text-muted-foreground text-sm block mb-1">Nombres</span>
-                  <span className="font-medium text-lg">{reservationData.usuario.nombres}</span>
-                </div>
-                <div className="glass p-4 rounded-lg">
-                  <span className="text-muted-foreground text-sm block mb-1">Apellidos</span>
-                  <span className="font-medium text-lg">{reservationData.usuario.apellidos}</span>
-                </div>
+          </div>
+
+          {/* Personal Info - Compact */}
+          <div className="glass p-4 rounded-lg">
+            <div className="flex items-center mb-3">
+              <User className="w-4 h-4 text-event-primary mr-2" />
+              <span className="font-semibold text-sm">Titular</span>
+            </div>
+            <div className="text-center">
+              <div className="font-medium">
+                {reservationData.usuario.nombres} {reservationData.usuario.apellidos}
               </div>
-              
-              <div className="glass p-4 rounded-lg">
-                <span className="text-muted-foreground text-sm block mb-1">Documento de Identidad</span>
-                <span className="font-medium text-lg">{reservationData.usuario.dni}</span>
-              </div>
-              
-              <div className="glass p-4 rounded-lg">
-                <span className="text-muted-foreground text-sm block mb-1">Correo Electrónico</span>
-                <span className="font-medium text-lg">{reservationData.usuario.correo}</span>
-              </div>
-              
-              <div className="glass p-4 rounded-lg">
-                <span className="text-muted-foreground text-sm block mb-1">Teléfono</span>
-                <span className="font-medium text-lg">{reservationData.usuario.telefono}</span>
+              <div className="text-sm text-muted-foreground">
+                DNI: {reservationData.usuario.dni}
               </div>
             </div>
-          </Card>
+          </div>
 
-          {/* Seat & Event Information */}
-          <div className="space-y-6">
-            {/* Seat Location */}
-            <Card className="glass-secondary p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-event-secondary to-blue-400 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Ubicación Asignada</h3>
-                  <p className="text-sm text-muted-foreground">Tu lugar en el evento</p>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="text-center py-6 glass rounded-lg">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-event-secondary to-blue-400 bg-clip-text text-transparent mb-2">
-                    {reservationData.mesa.nombre}
-                  </div>
-                  <div className="text-muted-foreground">Mesa</div>
-                </div>
-                
-                <div className="text-center py-6 glass rounded-lg">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-event-primary to-purple-400 bg-clip-text text-transparent mb-2">
-                    #{reservationData.asiento.numero}
-                  </div>
-                  <div className="text-muted-foreground">Asiento</div>
-                </div>
-              </div>
-            </Card>
+          {/* Access Code - Prominent */}
+          <div className="text-center glass-secondary p-4 rounded-lg border border-event-warning/30">
+            <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+              Código de Acceso
+            </div>
+            <div className="font-mono text-2xl font-bold text-event-primary tracking-wider mb-2">
+              {reservationData.usuario.codigo}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Usa este código para acceder al sistema
+            </div>
+          </div>
 
-            {/* Reservation Details */}
-            <Card className="glass-secondary p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-event-accent to-purple-400 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Detalles de la Reserva</h3>
-                  <p className="text-sm text-muted-foreground">Información del registro</p>
-                </div>
+          {/* Reservation Date */}
+          <div className="glass p-3 rounded-lg">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Reservado:</span>
               </div>
-              
-              <div className="space-y-4">
-                <div className="glass p-4 rounded-lg">
-                  <span className="text-muted-foreground text-sm block mb-1">Fecha de reserva</span>
-                  <span className="font-medium">{formatDate(reservationData.reserva.created_at)}</span>
-                </div>
-                
-                <div className="glass p-4 rounded-lg">
-                  <span className="text-muted-foreground text-sm block mb-1">Estado</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-event-success rounded-full animate-pulse" />
-                    <span className="font-medium text-event-success capitalize">
-                      {reservationData.reserva.estado}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Card>
+              <span className="font-medium">
+                {formatDate(reservationData.reserva.created_at)}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="mt-8 text-center">
-          <Card className="glass-primary p-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <p className="text-muted-foreground mb-4">
-              ¿Necesitas hacer cambios en tu reserva?
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Contacta al organizador del evento para cualquier modificación
-            </p>
-          </Card>
+        {/* Ticket Footer - Actions */}
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={handleShare}
+              variant="outline"
+              className="btn-ghost h-10 text-sm"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartir
+            </Button>
+            <Button
+              onClick={handleLogout}
+              className="btn-primary h-10 text-sm"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Salir
+            </Button>
+          </div>
+          
+          {/* Status */}
+          <div className="text-center">
+            <div className="inline-flex items-center px-3 py-1 bg-event-success/5 border border-event-success/20 rounded-full">
+              <CheckCircle className="w-3 h-3 text-event-success mr-2" />
+              <span className="text-xs text-event-success font-medium">
+                Reserva válida y activa
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Decorative floating elements */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-event-primary/10 rounded-full blur-2xl animate-float" />
-      <div className="absolute bottom-20 right-20 w-24 h-24 bg-event-secondary/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
-      <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-event-success/10 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
+        {/* Ticket perforations effect */}
+        <div className="absolute -left-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
+        <div className="absolute -right-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
+      </Card>
     </div>
   );
 };
