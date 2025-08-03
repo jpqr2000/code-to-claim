@@ -44,6 +44,7 @@ const SeatSelection = () => {
   const [selectedSeat, setSelectedSeat] = useState<Asiento | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedFloor, setSelectedFloor] = useState<1 | 2>(1);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,18 +174,39 @@ const SeatSelection = () => {
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
                   <DialogHeader>
                     <DialogTitle className="text-center text-xl font-bold bg-gradient-to-r from-event-primary to-event-secondary bg-clip-text text-transparent">
-                      Distribución del Venue
+                      Distribución del Venue - {selectedFloor === 1 ? 'Primer Piso' : 'Segundo Piso'}
                     </DialogTitle>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <Button
+                        variant={selectedFloor === 1 ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedFloor(1)}
+                        className={selectedFloor === 1 ? "bg-event-primary hover:bg-event-primary/90" : "border-event-primary/30 hover:bg-event-primary/10"}
+                      >
+                        Piso 1
+                      </Button>
+                      <Button
+                        variant={selectedFloor === 2 ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedFloor(2)}
+                        className={selectedFloor === 2 ? "bg-event-primary hover:bg-event-primary/90" : "border-event-primary/30 hover:bg-event-primary/10"}
+                      >
+                        Piso 2
+                      </Button>
+                    </div>
                   </DialogHeader>
                   <div className="flex justify-center items-center p-4">
                     <img
-                      src="/venue.jpeg"
-                      alt="Distribución del venue - Primer piso"
+                      src={selectedFloor === 1 ? "/venue.jpeg" : "/venue2.jpeg"}
+                      alt={`Distribución del venue - ${selectedFloor === 1 ? 'Primer' : 'Segundo'} piso`}
                       className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg border border-event-primary/20"
                     />
                   </div>
                   <div className="text-center text-sm text-muted-foreground px-4 pb-2">
-                    Distribución oficial del evento - Las mesas están numeradas del 1 al 28
+                    {selectedFloor === 1 
+                      ? "Distribución oficial del evento - Las mesas están numeradas del 1 al 28"
+                      : "Distribución oficial del evento - Las mesas están numeradas del 29 al 34"
+                    }
                   </div>
                 </DialogContent>
               </Dialog>
