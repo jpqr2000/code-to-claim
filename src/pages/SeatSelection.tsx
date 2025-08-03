@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ArrowLeft, Users, MapPin } from "lucide-react";
+import { ArrowLeft, Users, MapPin, Map } from "lucide-react";
 import SeatMap from "@/components/SeatMap";
 import ReservationForm from "@/components/ReservationForm";
 
@@ -154,9 +155,40 @@ const SeatSelection = () => {
       <div className="relative z-10 flex justify-center pt-8 pb-4">
         <div className="glass-primary border border-event-primary/20 rounded-2xl px-8 py-4 shadow-2xl animate-scale-in">
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary via-event-accent to-event-secondary bg-clip-text text-transparent">
-              Escenario principal
-            </h1>
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary via-event-accent to-event-secondary bg-clip-text text-transparent">
+                Escenario principal
+              </h1>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-glass-secondary border-event-primary/30 hover:bg-event-primary/10 transition-all duration-300"
+                  >
+                    <Map className="w-4 h-4 mr-2" />
+                    Ver distribución
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-center text-xl font-bold bg-gradient-to-r from-event-primary to-event-secondary bg-clip-text text-transparent">
+                      Distribución del Venue
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="flex justify-center items-center p-4">
+                    <img
+                      src="/venue.jpeg"
+                      alt="Distribución del venue - Primer piso"
+                      className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg border border-event-primary/20"
+                    />
+                  </div>
+                  <div className="text-center text-sm text-muted-foreground px-4 pb-2">
+                    Distribución oficial del evento - Las mesas están numeradas del 1 al 28
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
             <p className="text-sm text-foreground/80 mt-1 font-medium">Haz clic en cualquier asiento disponible</p>
           </div>
         </div>
