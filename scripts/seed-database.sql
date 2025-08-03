@@ -7,34 +7,34 @@ TRUNCATE TABLE asiento CASCADE;
 TRUNCATE TABLE mesa CASCADE;
 TRUNCATE TABLE usuario CASCADE;
 
--- 2. Insertar 50 mesas, cada una con 6 asientos
+-- 2. Insertar 35 mesas, cada una con 10 asientos
 DO $$
 DECLARE
     i INTEGER;
     mesa_id INTEGER;
     j INTEGER;
 BEGIN
-    -- Crear 50 mesas
-    FOR i IN 1..50 LOOP
+    -- Crear 35 mesas
+    FOR i IN 1..35 LOOP
         INSERT INTO public.mesa (numero, nombre, capacidad)
-        VALUES (i, 'Mesa ' || i, 6)
+        VALUES (i, 'Mesa ' || i, 10)
         RETURNING id INTO mesa_id;
         
-        -- Crear 6 asientos para cada mesa
-        FOR j IN 1..6 LOOP
+        -- Crear 10 asientos para cada mesa
+        FOR j IN 1..10 LOOP
             INSERT INTO public.asiento (numero, mesa_id, posicion, ocupado)
             VALUES (j, mesa_id, j, FALSE);
         END LOOP;
     END LOOP;
 END $$;
 
--- 3. Generar 300 códigos únicos de 6 dígitos para usuarios
+-- 3. Generar 400 códigos únicos de 6 dígitos para usuarios
 DO $$
 DECLARE
     i INTEGER;
     codigo_generado TEXT;
 BEGIN
-    FOR i IN 1..300 LOOP
+    FOR i IN 1..400 LOOP
         -- Generar código de 6 dígitos único
         LOOP
             codigo_generado := LPAD(FLOOR(RANDOM() * 1000000)::TEXT, 6, '0');
@@ -66,7 +66,7 @@ FROM public.usuario
 UNION ALL
 SELECT 
     'Total asientos por mesa', 
-    '6 asientos'
+    '10 asientos'
 UNION ALL
 SELECT 
     'Códigos de ejemplo', 

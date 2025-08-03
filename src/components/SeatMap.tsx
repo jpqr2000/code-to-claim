@@ -60,10 +60,9 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           className="relative cursor-pointer transition-all duration-300 transform scale-110"
           onClick={() => onSeatSelect(asiento)}
         >
-          {/* Selected seat - using brand gradient */}
-          <div className="w-16 h-16 bg-gradient-to-br from-event-primary to-event-accent rounded-xl border-2 border-white shadow-2xl flex flex-col items-center justify-center text-white animate-glow-pulse">
-            <div className="text-sm font-bold">#{asiento.numero}</div>
-            <div className="text-xs opacity-90">Seleccionado</div>
+          {/* Selected seat - más pequeño para 10 asientos */}
+          <div className="w-12 h-12 bg-gradient-to-br from-event-primary to-event-accent rounded-lg border border-white shadow-xl flex flex-col items-center justify-center text-white animate-glow-pulse">
+            <div className="text-xs font-bold">#{asiento.numero}</div>
           </div>
         </div>
       );
@@ -73,12 +72,12 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           key={asiento.id}
           className="relative cursor-not-allowed transition-all duration-300 group"
         >
-          {/* Occupied seat with name - GRANATE BACKGROUND, WHITE TEXT */}
-          <div className="w-16 h-20 bg-event-primary dark:bg-event-primary/90 rounded-xl border-2 border-event-primary/80 dark:border-event-primary/60 flex flex-col items-center justify-center shadow-lg">
-            <div className="text-xs font-bold mb-1 text-white">#{asiento.numero}</div>
-            <div className="text-xs font-medium text-center leading-tight px-1 text-white/90">
-              <div className="truncate max-w-[50px]">{reserva.usuario.nombres?.split(' ')[0]}</div>
-              <div className="truncate max-w-[50px]">{reserva.usuario.apellidos?.split(' ')[0]}</div>
+          {/* Occupied seat with name - más pequeño para 10 asientos */}
+          <div className="w-12 h-14 bg-event-primary dark:bg-event-primary/90 rounded-lg border border-event-primary/80 dark:border-event-primary/60 flex flex-col items-center justify-center shadow-md">
+            <div className="text-xs font-bold mb-0.5 text-white">#{asiento.numero}</div>
+            <div className="text-xs font-medium text-center leading-tight px-0.5 text-white/90">
+              <div className="truncate max-w-[40px] text-xs">{reserva.usuario.nombres?.split(' ')[0]}</div>
+              <div className="truncate max-w-[40px] text-xs">{reserva.usuario.apellidos?.split(' ')[0]}</div>
             </div>
           </div>
           
@@ -97,10 +96,9 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           className="relative cursor-pointer transition-all duration-300 hover:scale-105"
           onClick={() => onSeatSelect(asiento)}
         >
-          {/* Available seat - WHITE BACKGROUND, GRANATE TEXT (light theme) / SUBTLE BACKGROUND (dark theme) */}
-          <div className="w-16 h-16 bg-white dark:bg-event-success/10 rounded-xl border-2 border-event-primary/30 dark:border-event-success/30 flex flex-col items-center justify-center text-event-primary dark:text-event-success hover:bg-event-primary/10 dark:hover:bg-event-success/20 hover:border-event-primary/60 dark:hover:border-event-success/60 hover:shadow-xl shadow-lg">
-            <div className="text-sm font-bold text-event-primary dark:text-event-success">#{asiento.numero}</div>
-            <div className="text-xs text-event-primary/80 dark:text-event-success/80 font-medium">Libre</div>
+          {/* Available seat - más pequeño para 10 asientos */}
+          <div className="w-12 h-12 bg-white dark:bg-event-success/10 rounded-lg border border-event-primary/30 dark:border-event-success/30 flex flex-col items-center justify-center text-event-primary dark:text-event-success hover:bg-event-primary/10 dark:hover:bg-event-success/20 hover:border-event-primary/60 dark:hover:border-event-success/60 hover:shadow-lg shadow-sm">
+            <div className="text-xs font-bold text-event-primary dark:text-event-success">#{asiento.numero}</div>
           </div>
         </div>
       );
@@ -109,15 +107,15 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
 
   const renderMesa = (mesa: Mesa) => {
     const asientosMesa = getAsientosPorMesa(mesa.id);
-    const radius = 100; // Radio más grande
-    const centerX = 140;
-    const centerY = 140;
+    const radius = 120; // Radio aumentado para más espacio con 10 asientos
+    const centerX = 160;
+    const centerY = 160;
     const disponibles = asientosMesa.filter(a => !a.ocupado && !reservasPorAsiento[a.id]).length;
 
     return (
       <div key={mesa.id} className="relative mb-8">
-        {/* Mesa circular con efectos mejorados */}
-        <div className="w-72 h-72 flex items-center justify-center relative">
+        {/* Mesa circular con efectos mejorados - Aumentado para 10 asientos */}
+        <div className="w-80 h-80 flex items-center justify-center relative">
           {/* Centro de la mesa con glassmorfismo */}
           <div className="w-40 h-40 rounded-full glass-primary border-2 border-event-primary/40 flex items-center justify-center backdrop-blur-xl shadow-2xl relative overflow-hidden">
             {/* Efecto de brillo interno */}
@@ -161,11 +159,11 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
             );
           })}
 
-          {/* Líneas conectoras sutiles desde el centro */}
+          {/* Líneas conectoras sutiles desde el centro - ajustadas para nuevo tamaño */}
           {asientosMesa.map((asiento, index) => {
             const angle = (index / asientosMesa.length) * 2 * Math.PI;
-            const x1 = centerX + 70 * Math.cos(angle - Math.PI / 2);
-            const y1 = centerY + 70 * Math.sin(angle - Math.PI / 2);
+            const x1 = centerX + 80 * Math.cos(angle - Math.PI / 2);
+            const y1 = centerY + 80 * Math.sin(angle - Math.PI / 2);
             const x2 = centerX + radius * Math.cos(angle - Math.PI / 2);
             const y2 = centerY + radius * Math.sin(angle - Math.PI / 2);
             
@@ -173,8 +171,8 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
               <svg
                 key={`line-${asiento.id}`}
                 className="absolute inset-0 pointer-events-none"
-                width="280"
-                height="280"
+                width="320"
+                height="320"
               >
                 <line
                   x1={x1}
@@ -183,11 +181,11 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
                   y2={y2}
                   stroke="url(#gradient)"
                   strokeWidth="1"
-                  opacity="0.3"
+                  opacity="0.2"
                 />
                 <defs>
                   <linearGradient id="gradient" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="var(--event-primary)" stopOpacity="0.6" />
+                    <stop stopColor="var(--event-primary)" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="var(--event-primary)" stopOpacity="0.1" />
                   </linearGradient>
                 </defs>
@@ -214,7 +212,7 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
     <div className="h-full w-full p-4 overflow-auto">
       {/* Grid de mesas optimizado para todo el espacio */}
       <div className="min-h-full flex items-center justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8 xl:gap-12 justify-items-center items-center max-w-none">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8 xl:gap-12 justify-items-center items-center max-w-none pb-32">
           {mesas.map(renderMesa)}
         </div>
       </div>

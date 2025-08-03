@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowLeft, Users, MapPin, Map } from "lucide-react";
 import SeatMap from "@/components/SeatMap";
 import ReservationForm from "@/components/ReservationForm";
@@ -143,10 +142,6 @@ const SeatSelection = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Theme toggle */}
-      <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle />
-      </div>
 
       {/* Background */}
       <div className="absolute inset-0 gradient-animated opacity-15 dark:opacity-20" />
