@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { CheckCircle, Sparkles, Home, User, MapPin, Calendar, Share2, Copy } from "lucide-react";
 
 interface ReservationData {
@@ -186,13 +187,18 @@ const ReservationSuccess = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Theme toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+      
       {/* Animated background */}
-      <div className="absolute inset-0 gradient-animated opacity-30" />
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 gradient-animated opacity-20 dark:opacity-30" />
+      <div className="absolute inset-0 bg-background/90 dark:bg-background/80 backdrop-blur-sm" />
       
       {/* Success animation orbs */}
-      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-event-success/20 rounded-full blur-xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-event-primary/20 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-event-success/15 dark:bg-event-success/20 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-event-primary/15 dark:bg-event-primary/20 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }} />
       
       {/* Ticket Design - Compact, no scroll */}
       <Card className="relative z-10 w-full max-w-md mx-auto glass-primary animate-scale-in border-2 border-dashed border-event-primary/30 p-6">

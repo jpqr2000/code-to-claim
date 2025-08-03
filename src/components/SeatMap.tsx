@@ -60,8 +60,8 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           className="relative cursor-pointer transition-all duration-300 transform scale-110"
           onClick={() => onSeatSelect(asiento)}
         >
-          {/* Selected seat */}
-          <div className="w-16 h-16 bg-gradient-to-br from-event-primary to-event-secondary rounded-xl border-2 border-white shadow-2xl flex flex-col items-center justify-center text-white animate-glow-pulse">
+          {/* Selected seat - using brand gradient */}
+          <div className="w-16 h-16 bg-gradient-to-br from-event-primary to-event-accent rounded-xl border-2 border-white shadow-2xl flex flex-col items-center justify-center text-white animate-glow-pulse">
             <div className="text-sm font-bold">#{asiento.numero}</div>
             <div className="text-xs opacity-90">Seleccionado</div>
           </div>
@@ -73,10 +73,10 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           key={asiento.id}
           className="relative cursor-not-allowed transition-all duration-300 group"
         >
-          {/* Occupied seat with name */}
-          <div className="w-16 h-20 bg-gradient-to-br from-blue-500/10 to-blue-600/15 rounded-xl border-2 border-blue-500/15 flex flex-col items-center justify-center backdrop-blur-sm shadow-lg">
-            <div className="text-xs font-bold mb-1 text-blue-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] filter brightness-150">#{asiento.numero}</div>
-            <div className="text-xs font-medium text-center leading-tight px-1 text-blue-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] filter brightness-125">
+          {/* Occupied seat with name - GRANATE BACKGROUND, WHITE TEXT */}
+          <div className="w-16 h-20 bg-event-primary dark:bg-event-primary/90 rounded-xl border-2 border-event-primary/80 dark:border-event-primary/60 flex flex-col items-center justify-center shadow-lg">
+            <div className="text-xs font-bold mb-1 text-white">#{asiento.numero}</div>
+            <div className="text-xs font-medium text-center leading-tight px-1 text-white/90">
               <div className="truncate max-w-[50px]">{reserva.usuario.nombres?.split(' ')[0]}</div>
               <div className="truncate max-w-[50px]">{reserva.usuario.apellidos?.split(' ')[0]}</div>
             </div>
@@ -97,10 +97,10 @@ const SeatMap = ({ mesas, asientos, reservas, selectedSeat, onSeatSelect }: Seat
           className="relative cursor-pointer transition-all duration-300 hover:scale-105"
           onClick={() => onSeatSelect(asiento)}
         >
-          {/* Available seat */}
-          <div className="w-16 h-16 bg-gradient-to-br from-event-success/10 to-event-success/15 rounded-xl border-2 border-event-success/15 flex flex-col items-center justify-center text-event-success hover:bg-event-success/50 hover:border-event-success/50 hover:shadow-xl backdrop-blur-sm shadow-lg">
-            <div className="text-sm font-bold text-event-success drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] filter brightness-150">#{asiento.numero}</div>
-            <div className="text-xs text-event-success font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] filter brightness-125">Libre</div>
+          {/* Available seat - WHITE BACKGROUND, GRANATE TEXT (light theme) / SUBTLE BACKGROUND (dark theme) */}
+          <div className="w-16 h-16 bg-white dark:bg-event-success/10 rounded-xl border-2 border-event-primary/30 dark:border-event-success/30 flex flex-col items-center justify-center text-event-primary dark:text-event-success hover:bg-event-primary/10 dark:hover:bg-event-success/20 hover:border-event-primary/60 dark:hover:border-event-success/60 hover:shadow-xl shadow-lg">
+            <div className="text-sm font-bold text-event-primary dark:text-event-success">#{asiento.numero}</div>
+            <div className="text-xs text-event-primary/80 dark:text-event-success/80 font-medium">Libre</div>
           </div>
         </div>
       );

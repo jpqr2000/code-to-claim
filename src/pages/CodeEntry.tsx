@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Lock, Sparkles } from "lucide-react";
 
 const CodeEntry = () => {
@@ -15,7 +16,7 @@ const CodeEntry = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (code.length !== 6) {
       toast({
         title: "Código inválido",
@@ -82,21 +83,26 @@ const CodeEntry = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Theme toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Animated background */}
-      <div className="absolute inset-0 gradient-animated opacity-30" />
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-      
+      <div className="absolute inset-0 gradient-animated opacity-20 dark:opacity-30" />
+      <div className="absolute inset-0 bg-background/90 dark:bg-background/80 backdrop-blur-sm" />
+
       {/* Floating orbs for ambiance */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-event-primary/20 rounded-full blur-xl animate-float" />
-      <div className="absolute bottom-20 right-20 w-24 h-24 bg-event-secondary/20 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} />
-      
+      <div className="absolute top-20 left-20 w-32 h-32 bg-event-primary/15 dark:bg-event-primary/20 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-20 right-20 w-24 h-24 bg-event-secondary/15 dark:bg-event-secondary/20 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} />
+
       <Card className="relative z-10 w-full max-w-md p-8 glass-primary animate-scale-in">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-event-primary to-event-secondary rounded-full mb-4 animate-glow-pulse">
-            <Lock className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center">
+            <img src="/logo.jpeg" alt="Logo" className="w-16 h-16" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary to-event-secondary bg-clip-text text-transparent mb-2">
-            Event Manager
+            Reencuentro de egresados FIGMM 2025
           </h1>
           <p className="text-muted-foreground">
             Ingresa tu código de 6 dígitos para acceder

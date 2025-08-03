@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowLeft, Users, MapPin } from "lucide-react";
 import SeatMap from "@/components/SeatMap";
 import ReservationForm from "@/components/ReservationForm";
@@ -42,11 +43,11 @@ const SeatSelection = () => {
   const [selectedSeat, setSelectedSeat] = useState<Asiento | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  
+
   const userId = location.state?.userId;
 
   useEffect(() => {
@@ -54,14 +55,14 @@ const SeatSelection = () => {
       navigate("/");
       return;
     }
-    
+
     loadData();
   }, [userId, navigate]);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Cargar mesas
       const { data: mesasData, error: mesasError } = await supabase
         .from("mesa")
@@ -112,7 +113,7 @@ const SeatSelection = () => {
 
   const handleSeatSelect = (asiento: Asiento) => {
     if (asiento.ocupado) return;
-    
+
     setSelectedSeat(asiento);
     setShowForm(true);
   };
@@ -140,18 +141,23 @@ const SeatSelection = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Theme toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Background */}
-      <div className="absolute inset-0 gradient-animated opacity-20" />
-      <div className="absolute inset-0 bg-background/90 backdrop-blur-sm" />
-      
+      <div className="absolute inset-0 gradient-animated opacity-15 dark:opacity-20" />
+      <div className="absolute inset-0 bg-background/95 dark:bg-background/90 backdrop-blur-sm" />
+
       {/* Scrollable Title */}
       <div className="relative z-10 flex justify-center pt-8 pb-4">
-        <div className="bg-black/40 backdrop-blur-3xl border border-white/20 rounded-2xl px-8 py-4 shadow-2xl animate-scale-in">
+        <div className="glass-primary border border-event-primary/20 rounded-2xl px-8 py-4 shadow-2xl animate-scale-in">
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary via-event-secondary to-purple-400 bg-clip-text text-transparent">
-              Selecciona tu Asiento
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-event-primary via-event-accent to-event-secondary bg-clip-text text-transparent">
+              Escenario principal
             </h1>
-            <p className="text-sm text-white/90 mt-1 font-medium">Haz clic en cualquier asiento disponible</p>
+            <p className="text-sm text-foreground/80 mt-1 font-medium">Haz clic en cualquier asiento disponible</p>
           </div>
         </div>
       </div>
@@ -169,67 +175,67 @@ const SeatSelection = () => {
 
       {/* macOS Style Floating Dock */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
-        <div className="bg-black/40 backdrop-blur-3xl border border-white/20 rounded-2xl px-6 py-4 shadow-2xl animate-scale-in">
+        <div className="glass-secondary border border-event-primary/10 rounded-2xl px-6 py-4 shadow-2xl animate-scale-in">
           <div className="flex items-center space-x-6">
             {/* Elegant Exit Button */}
             <Button
               variant="ghost"
               onClick={handleBack}
-              className="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-300 p-0 hover:scale-110 shadow-lg hover:shadow-xl group"
+              className="w-14 h-14 rounded-2xl bg-secondary/50 hover:bg-secondary/70 border border-border hover:border-border/70 transition-all duration-300 p-0 hover:scale-110 shadow-lg hover:shadow-xl group"
               title="Salir del evento"
             >
-              <ArrowLeft className="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
+              <ArrowLeft className="w-6 h-6 text-foreground/80 group-hover:text-foreground transition-colors" />
             </Button>
 
             {/* Separator */}
-            <div className="w-px h-8 bg-white/30"></div>
+            <div className="w-px h-8 bg-border"></div>
 
             {/* Stats */}
-            <div className="flex items-center space-x-4 text-white">
+            <div className="flex items-center space-x-4 text-foreground">
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-event-success rounded-full shadow-lg border border-event-success/50"></div>
+                <div className="w-4 h-4 bg-white dark:bg-event-success rounded-full shadow-lg border-2 border-event-primary dark:border-event-success/50"></div>
                 <span className="text-sm font-bold">{asientos.length - reservas.length}</span>
-                <span className="text-xs text-white/90 font-medium">Libres</span>
+                <span className="text-xs text-foreground/80 font-medium">Libres</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-blue-500 rounded-full shadow-lg border border-blue-400/50"></div>
+                <div className="w-4 h-4 bg-event-primary rounded-full shadow-lg border border-event-primary/50"></div>
                 <span className="text-sm font-bold">{reservas.length}</span>
-                <span className="text-xs text-white/90 font-medium">Ocupados</span>
+                <span className="text-xs text-foreground/80 font-medium">Ocupados</span>
               </div>
             </div>
 
             {/* Selected Seat Info */}
             {selectedSeat && (
               <>
-                <div className="w-px h-8 bg-white/30"></div>
+                <div className="w-px h-8 bg-border"></div>
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-event-primary via-event-secondary to-purple-500 rounded-xl flex items-center justify-center shadow-lg border border-white/20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-event-primary to-event-accent rounded-xl flex items-center justify-center shadow-lg border border-white/20">
                     <span className="text-sm font-bold text-white">#{selectedSeat.numero}</span>
                   </div>
-                  <div className="text-white">
+                  <div className="text-foreground">
                     <div className="text-sm font-bold">
                       {mesas.find(m => m.id === selectedSeat.mesa_id)?.nombre}
                     </div>
-                    <div className="text-xs text-white/90 font-medium">Seleccionado</div>
+                    <div className="text-xs text-foreground/80 font-medium">Seleccionado</div>
                   </div>
                 </div>
               </>
             )}
 
             {/* Legend */}
-            <div className="w-px h-8 bg-white/30"></div>
+            <div className="w-px h-8 bg-border"></div>
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-1">
-                <div className="w-3 h-3 bg-event-success rounded-full shadow-sm border border-event-success/30"></div>
-                <span className="text-xs text-white/90 font-medium">Libre</span>
+                <div className="w-3 h-3 bg-white dark:bg-event-success rounded-full shadow-sm border border-event-primary dark:border-event-success/30"></div>
+                <span className="text-xs text-foreground/90 font-medium">Libre</span>
               </div>
               <div className="flex items-center space-x-1">
-                <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm border border-blue-400/30"></div>
-                <span className="text-xs text-white/90 font-medium">Ocupado</span>
+                <div className="w-3 h-3 bg-event-primary rounded-full shadow-sm border border-event-primary/30"></div>
+                <span className="text-xs text-foreground/90 font-medium">Ocupado</span>
               </div>
               <div className="flex items-center space-x-1">
-                <div className="w-3 h-3 bg-gradient-to-r from-event-primary to-event-secondary rounded-full shadow-sm border border-white/20"></div>
-                <span className="text-xs text-white/90 font-medium">Seleccionado</span>
+                <div className="w-3 h-3 bg-gradient-to-r from-event-primary to-event-accent rounded-full shadow-sm border border-white/20 dark:border-foreground/20"></div>
+                <span className="text-xs text-foreground/90 font-medium">Seleccionado</span>
               </div>
             </div>
           </div>
